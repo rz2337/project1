@@ -149,13 +149,12 @@ def go_back_from_register():
 
 
 
-# Example of adding new data to the database
 @app.route('/Login/login', methods=['POST'])
 def login():
-  return render_template("register.html")
   userid = request.form['userid']
   password = requster.form['password']
   cursor = g.conn.execute('select password from user_account where userid=?', (userid,))
+  return render_template("anotherfile.html")
   for result in cursor:
     if result==password:
       request.session["userid"]=userid
@@ -163,10 +162,9 @@ def login():
       request.session.set_expiry(0)
       return render_template("anotherfile.html")
  
-    else:
-      content=dict(data="Wrong user id or password")
-      return render_template("index.html",**content)
-      #return render_to_response('index.html',{'status':'Wrong user id or password'})
+  content=dict(data="Wrong user id or password")
+  return render_template("index.html",**content)
+    #return render_to_response('index.html',{'status':'Wrong user id or password'})
   return redirect('/')
 
 
