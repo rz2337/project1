@@ -61,8 +61,8 @@ engine = create_engine(DATABASEURI)
 # 
 # The setup code should be deleted once you switch to using the Part 2 postgresql database
 #
-engine.execute("""DROP TABLE IF EXISTS test;""")
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
+#engine.execute("""DROP TABLE IF EXISTS test;""")
+'''engine.execute("""CREATE TABLE IF NOT EXISTS test (
   id serial,
   name text
 );""")
@@ -70,6 +70,7 @@ engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'
 #
 # END SQLITE SETUP CODE
 #
+'''
 
 
 
@@ -116,6 +117,7 @@ def teardown_request(exception):
 #
 @app.route('/')
 def index():
+  return render_template("index.html")
   """
   request is a special object that Flask provides to access web request information:
 
@@ -126,54 +128,6 @@ def index():
   See its API: http://flask.pocoo.org/docs/0.10/api/#incoming-request-data
   """
 
-  # DEBUG: this is debugging code to see what request looks like
-  print request.args
-
-
-  #
-  # example of a database query
-  #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
-  for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
-  cursor.close()
-
-  #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be 
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #     
-  #     # creates a <div> tag for each element in data
-  #     # will print: 
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
-  context = dict(data = names)
-
-
-  #
-  # render_template looks in the templates/ folder for files.
-  # for example, the below file reads template/index.html
-  #
-  return render_template("index.html", **context)
-
 #
 # This is an example of a different path.  You can see it at
 # 
@@ -182,23 +136,36 @@ def index():
 # notice that the functio name is another() rather than index()
 # the functions for each app.route needs to have different names
 #
-@app.route('/another')
-def another():
-  return render_template("anotherfile.html")
+@app.route('/Login/register')
+def goto_register():
+  return render_template("register.html")
+
+@app.route('/Register/go_back')
+def goto_register():
+  return render_template("index.html")
+
 
 
 # Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
+@app.route('/Login/login', methods=['POST'])
+def login():
+  userid = request.form['userid']
+  password = requster.form['password']
+  print "get userid=%d and password=%s" %(userid, password)
+  cursor = g.conn.execute('select password from user_account where userid=?', (userid,))
+  for result in cursor:
+    if result==password:
+      print "match password"
+      request.session["userid"]=userid
+      request.session["password"]=password
+      request.session.set_expiry(0)
+      return render_to_response('index.html',{'status':'Login successfully!'})
+ 
+    else:
+      print "Cannot match password"
+      return render_to_response('index.html',{'status':'Wrong user id or password'})
   return redirect('/')
 
-
-@app.route('/login')
-def login():
-    abort(401)
-    this_is_never_executed()
 
 
 if __name__ == "__main__":
@@ -207,7 +174,7 @@ if __name__ == "__main__":
   @click.command()
   @click.option('--debug', is_flag=True)
   @click.option('--threaded', is_flag=True)
-  @click.argument('HOST', default='127.0.0.1')
+  @click.argument('HOST', default='0.0.0.0')
   @click.argument('PORT', default=8111, type=int)
   def run(debug, threaded, host, port):
     """
