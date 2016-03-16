@@ -141,7 +141,7 @@ def goto_register():
   return render_template("register.html")
 
 @app.route('/Register/go_back')
-def goto_register():
+def go_back_from_register():
   return render_template("index.html")
 
 
@@ -149,6 +149,7 @@ def goto_register():
 # Example of adding new data to the database
 @app.route('/Login/login', methods=['POST'])
 def login():
+  print "Begin to login"
   userid = request.form['userid']
   password = requster.form['password']
   print "get userid=%d and password=%s" %(userid, password)
