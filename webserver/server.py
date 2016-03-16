@@ -117,7 +117,10 @@ def teardown_request(exception):
 #
 @app.route('/')
 def index():
-  return render_template("index.html")
+  a=[]
+  a.append("Hello!")
+  content=dict(data=a)
+  return render_template("index.html",**content)
   """
   request is a special object that Flask provides to access web request information:
 
@@ -149,22 +152,21 @@ def go_back_from_register():
 # Example of adding new data to the database
 @app.route('/Login/login', methods=['POST'])
 def login():
-  print "Begin to login"
+  return render_template("register.html")
   userid = request.form['userid']
   password = requster.form['password']
-  print "get userid=%d and password=%s" %(userid, password)
   cursor = g.conn.execute('select password from user_account where userid=?', (userid,))
   for result in cursor:
     if result==password:
-      print "match password"
       request.session["userid"]=userid
       request.session["password"]=password
       request.session.set_expiry(0)
-      return render_to_response('index.html',{'status':'Login successfully!'})
+      return render_template("anotherfile.html")
  
     else:
-      print "Cannot match password"
-      return render_to_response('index.html',{'status':'Wrong user id or password'})
+      content=dict(data="Wrong user id or password")
+      return render_template("index.html",**content)
+      #return render_to_response('index.html',{'status':'Wrong user id or password'})
   return redirect('/')
 
 

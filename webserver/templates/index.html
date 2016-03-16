@@ -12,6 +12,11 @@
 <form method="POST" action="/Login/login">
 <p>Login <input type="integer" name="userid"> <input type="password" name="password"> <input type="submit" value="Login"></p>
 </form>
+<div>
+  {% for n in data %}
+  <div>{{n}}</div>
+  {% endfor %}
+</div>
 
 <p><a href="/Login/register">Register</a></p>
 </body>
