@@ -37,7 +37,7 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://ewu2493:foobar@w4111db.eastus.cloudapp.azure.com/ewu2493"
 #
-DATABASEURI = "sqlite:///test.db"
+DATABASEURI = "postgresql://rz2337:LNUATE@w4111db.eastus.cloudapp.azure.com/rz2337"
 
 
 #
@@ -207,7 +207,7 @@ if __name__ == "__main__":
   @click.command()
   @click.option('--debug', is_flag=True)
   @click.option('--threaded', is_flag=True)
-  @click.argument('HOST', default='0.0.0.0')
+  @click.argument('HOST', default='127.0.0.1')
   @click.argument('PORT', default=8111, type=int)
   def run(debug, threaded, host, port):
     """
